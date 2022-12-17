@@ -99,5 +99,12 @@ public class BookService {
         return ResponseEntity.ok("Book has been returned");
     }
 
+    public List<BookResponse> allBorrowedBooks() {
+        return bookRepository.findAllByLoan_DueDateAfter(LocalDate.now()).stream().map(BookResponse::new).toList();
+    }
+
+    public List<BookResponse> exceededDueDateBooks() {
+        return bookRepository.findAllByLoan_DueDateBefore(LocalDate.now()).stream().map(BookResponse::new).toList();
+    }
 
 }
