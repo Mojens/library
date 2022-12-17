@@ -31,37 +31,30 @@ public class LoanService {
     }
 
 
-    // TODO: 17/12/2022 dobbelt check om denne metode virker korrekt
     public LoanResponse createLoan(@RequestBody LoanRequest loanRequest) {
         Member member = memberRepository.findById(loanRequest.getMemberId()).orElseThrow(() -> new RuntimeException("Member not found"));
         List<Book> bookList = bookRepository.findAllById(loanRequest.getBookIds());
         if (bookList.size() != loanRequest.getBookIds().size()) {
             throw new RuntimeException("One or more books not found");
         }
+        if (bookList.stream().anyMatch(b -> b.getLoan() != null)) {
+            if (bookList.stream().anyMatch(b -> b.getLoan().getDueDate().isAfter(LocalDate.now()))) {
+                throw new RuntimeException("One or more books are already loaned");
+            }
+        }
         Loan loan = Loan.builder()
                 .member(member)
-                .checkoutDate(loanRequest.getCheckoutDate())
-                .dueDate(loanRequest.getDueDate())
+                .books(bookList)
+                .checkoutDate(LocalDate.now())
+                .dueDate(LocalDate.now().plusDays(14))
                 .returnDate(loanRequest.getReturnDate())
                 .build();
-
+        loanRepository.save(loan);
         member.setLoans(List.of(loan));
         memberRepository.save(member);
-
-        bookList.forEach(book -> {
-            if (book.getLoan() != null) {
-                if (!book.getLoan().getDueDate().isAfter(LocalDate.now())) {
-                    throw new RuntimeException("\n" + "Book is already loaned with due date: " + book.getLoan().getDueDate() + "\n"
-                            + "Please return the book before you can loan it again" + "\n"
-                            + "Book title: " + book.getTitle() + "\n");
-                }
-            }
-        });
-        loan.setBooks(bookList);
+        bookList.forEach(b -> b.setLoan(loan));
         bookRepository.saveAll(bookList);
-
-        LoanResponse loanResponse = new LoanResponse(loan);
-        return loanResponse;
+        return new LoanResponse(loan);
     }
 
 

@@ -125,7 +125,7 @@ public class setupLibrary implements ApplicationRunner {
                 .dueDate(LocalDate.now().plusDays(14))
                 .checkoutDate(LocalDate.now())
                 .memberId(m2.getId())
-                .bookIds(List.of(b2.getId()))
+                .bookIds(List.of(b4.getId()))
                 .build();
        loanService.createLoan(loanRequest);
 
