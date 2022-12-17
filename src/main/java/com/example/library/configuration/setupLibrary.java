@@ -120,6 +120,8 @@ public class setupLibrary implements ApplicationRunner {
         bookRepository.save(b3);
 
 
+        //Test Service Method
+
         LoanRequest loanRequest = LoanRequest.builder()
                 .returnDate(LocalDate.now().plusDays(7))
                 .dueDate(LocalDate.now().plusDays(14))

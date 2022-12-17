@@ -34,10 +34,21 @@ public class LoanService {
     public LoanResponse createLoan(@RequestBody LoanRequest loanRequest) {
         Member member = memberRepository.findById(loanRequest.getMemberId()).orElseThrow(() -> new RuntimeException("Member not found"));
         List<Book> bookList = bookRepository.findAllById(loanRequest.getBookIds());
+        //Check if the ids is valid books
         if (bookList.size() != loanRequest.getBookIds().size()) {
             throw new RuntimeException("One or more books not found");
         }
+        //Check if there is a reservation
+        if (bookList.stream().anyMatch(b -> b.getReservation() != null)) {
+            //Check if the reservation is active & check if the dueDate from request is after the reservation date
+            if (bookList.stream().anyMatch(b -> b.getReservation().getReservationDate().isAfter(LocalDate.now().minusDays(1))) &&
+                    bookList.stream().anyMatch(b -> b.getReservation().getReservationDate().isBefore(loanRequest.getDueDate()))) {
+                throw new RuntimeException("One or more books are reserved");
+            }
+        }
+        //Check if there is a loan
         if (bookList.stream().anyMatch(b -> b.getLoan() != null)) {
+            //Check if the loan is active & check if the dueDate from request is after the loan date
             if (bookList.stream().anyMatch(b -> b.getLoan().getDueDate().isAfter(LocalDate.now()))) {
                 throw new RuntimeException("One or more books are already loaned");
             }
@@ -49,6 +60,7 @@ public class LoanService {
                 .dueDate(LocalDate.now().plusDays(14))
                 .returnDate(loanRequest.getReturnDate())
                 .build();
+
         loanRepository.save(loan);
         member.setLoans(List.of(loan));
         memberRepository.save(member);
