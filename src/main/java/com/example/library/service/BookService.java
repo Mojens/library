@@ -8,8 +8,6 @@ import com.example.library.entity.Reservation;
 import com.example.library.repository.BookRepository;
 import com.example.library.repository.LoanRepository;
 import com.example.library.repository.ReservationRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -109,6 +107,11 @@ public class BookService {
     public List<BookResponse> exceededDueDateBooks() {
         loanRepository.deleteAllByBooksIsNull();
         return bookRepository.findAllByLoan_DueDateBefore(LocalDate.now()).stream().map(BookResponse::new).toList();
+    }
+
+    public BookResponse findBookById(@PathVariable Long id){
+        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("book not found"));
+        return new BookResponse(book);
     }
 
 }

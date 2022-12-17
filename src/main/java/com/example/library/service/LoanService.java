@@ -2,6 +2,7 @@ package com.example.library.service;
 
 import com.example.library.dto.LoanRequest;
 import com.example.library.dto.LoanResponse;
+import com.example.library.dto.MemberResponse;
 import com.example.library.entity.Book;
 import com.example.library.entity.Loan;
 import com.example.library.entity.Member;
@@ -9,6 +10,7 @@ import com.example.library.repository.BookRepository;
 import com.example.library.repository.LoanRepository;
 import com.example.library.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
@@ -70,6 +72,14 @@ public class LoanService {
         bookRepository.saveAll(bookList);
         return new LoanResponse(loan);
     }
+
+    public List<MemberResponse> getAllMembers(){
+        return memberRepository.findAll().stream().map(MemberResponse::new).toList();
+    }
+    public MemberResponse getMemberById(@PathVariable Long id){
+        return new MemberResponse(memberRepository.findById(id).orElseThrow(() -> new RuntimeException("Member not found")));
+    }
+
 
 
 }

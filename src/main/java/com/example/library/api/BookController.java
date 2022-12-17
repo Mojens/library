@@ -1,12 +1,8 @@
 package com.example.library.api;
 
-import com.example.library.dto.BookRequest;
-import com.example.library.dto.BookResponse;
-import com.example.library.dto.LoanRequest;
-import com.example.library.dto.LoanResponse;
+import com.example.library.dto.*;
 import com.example.library.service.BookService;
 import com.example.library.service.LoanService;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,16 +21,19 @@ public class BookController {
         this.bookService = bookService;
         this.loanService = loanService;
     }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public BookResponse createBook(@RequestBody BookRequest bookRequest) {
         return bookService.createBook(bookRequest);
     }
+
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public BookResponse updateBook(@RequestBody BookRequest bookRequest, @PathVariable Long id) {
         return bookService.updateBook(bookRequest, id);
     }
+
     @GetMapping
-    List<BookResponse> readAllBooks(){
+    List<BookResponse> readAllBooks() {
         return bookService.readAllBooks();
     }
 
@@ -58,7 +57,7 @@ public class BookController {
         return bookService.allBorrowedBooks();
     }
 
-    @PostMapping(value = "/loan",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/loan", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public LoanResponse createLoan(@RequestBody LoanRequest loanRequest) {
         return loanService.createLoan(loanRequest);
     }
@@ -68,15 +67,19 @@ public class BookController {
         return loanService.getAllLoans();
     }
 
+    @GetMapping(value = "/{id}")
+    public BookResponse getBookById(@PathVariable Long id) {
+        return bookService.findBookById(id);
+    }
 
-
-
-
-
-
-
-
-
+    @GetMapping(value = "/members")
+    public List<MemberResponse> getAllMembers() {
+        return loanService.getAllMembers();
+    }
+    @GetMapping(value = "/members/{id}")
+    public MemberResponse getMemberById(@PathVariable Long id) {
+        return loanService.getMemberById(id);
+    }
 
 
 }

@@ -93,7 +93,14 @@ public class setupLibrary implements ApplicationRunner {
                 .publishYear("2020")
                 .isbn("1234567893")
                 .build();
-        List<Book> books = List.of(b1, b2, b3, b4);
+        Book b5 = Book.builder()
+                .title("Book5")
+                .author("Author5")
+                .publisher("Publisher5")
+                .publishYear("2020")
+                .isbn("1234567894")
+                .build();
+        List<Book> books = List.of(b1, b2, b3, b4, b5);
         bookRepository.saveAll(books);
 
         //Make a loan
@@ -134,6 +141,15 @@ public class setupLibrary implements ApplicationRunner {
                 .bookIds(List.of(b4.getId()))
                 .build();
         loanService.createLoan(loanRequest);
+
+        LoanRequest loanRequest2 = LoanRequest.builder()
+                .returnDate(LocalDate.now().plusDays(7))
+                .dueDate(LocalDate.now().minusDays(14))
+                .checkoutDate(LocalDate.now())
+                .memberId(m2.getId())
+                .bookIds(List.of(b5.getId()))
+                .build();
+        loanService.createLoan(loanRequest2);
 
 
     }
