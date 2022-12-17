@@ -135,22 +135,6 @@ public class setupLibrary implements ApplicationRunner {
                 .build();
         loanService.createLoan(loanRequest);
 
-        System.out.println(bookService.returnBook(b1.getId()));
-        /*
-        if (b1.getLoan() != null) {
-            Loan foundLoan = loanRepository.findById(b1.getLoan().getId()).get();
-            List<Book> loanBookList = foundLoan.getBooks();
-            loanBookList.removeIf(book -> book.getId().equals(b1.getId()));
-            b1.setLoan(null);
-            bookRepository.save(b1);
-            foundLoan.setBooks(loanBookList);
-            loanRepository.save(foundLoan);
-            System.out.println(loanRepository.findAll());
-            loanRepository.deleteAllByBooksIsNull();
-            System.out.println(loanRepository.findAll());
-        }
-         */
-
 
     }
 }

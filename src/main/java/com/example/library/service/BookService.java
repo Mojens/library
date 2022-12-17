@@ -100,10 +100,12 @@ public class BookService {
     }
 
     public List<BookResponse> allBorrowedBooks() {
+        loanRepository.deleteAllByBooksIsNull();
         return bookRepository.findAllByLoan_DueDateAfter(LocalDate.now()).stream().map(BookResponse::new).toList();
     }
 
     public List<BookResponse> exceededDueDateBooks() {
+        loanRepository.deleteAllByBooksIsNull();
         return bookRepository.findAllByLoan_DueDateBefore(LocalDate.now()).stream().map(BookResponse::new).toList();
     }
 

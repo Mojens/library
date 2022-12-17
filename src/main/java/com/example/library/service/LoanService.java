@@ -31,6 +31,10 @@ public class LoanService {
     }
 
 
+    List<LoanResponse> getAllLoans() {
+        return loanRepository.findAll().stream().map(LoanResponse::new).toList();
+    }
+
     public LoanResponse createLoan(@RequestBody LoanRequest loanRequest) {
         Member member = memberRepository.findById(loanRequest.getMemberId()).orElseThrow(() -> new RuntimeException("Member not found"));
         List<Book> bookList = bookRepository.findAllById(loanRequest.getBookIds());
@@ -56,14 +60,12 @@ public class LoanService {
         Loan loan = Loan.builder()
                 .member(member)
                 .books(bookList)
-                .checkoutDate(LocalDate.now())
-                .dueDate(LocalDate.now().plusDays(14))
+                .checkoutDate(loanRequest.getCheckoutDate())
+                .dueDate(loanRequest.getDueDate())
                 .returnDate(loanRequest.getReturnDate())
                 .build();
 
         loanRepository.save(loan);
-        member.setLoans(List.of(loan));
-        memberRepository.save(member);
         bookList.forEach(b -> b.setLoan(loan));
         bookRepository.saveAll(bookList);
         return new LoanResponse(loan);
