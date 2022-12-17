@@ -4,6 +4,8 @@ import com.example.library.dto.BookRequest;
 import com.example.library.dto.BookResponse;
 import com.example.library.entity.Book;
 import com.example.library.repository.BookRepository;
+import com.example.library.repository.LoanRepository;
+import com.example.library.repository.ReservationRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,8 @@ class BookServiceTest {
 
     @Autowired
     public static BookRepository bookRepository;
+    public static LoanRepository loanRepository;
+    public static ReservationRepository reservationRepository;
 
     @BeforeAll
     public static void setupData(@Autowired BookRepository book_Repository) {
@@ -55,7 +59,7 @@ class BookServiceTest {
 
     @BeforeEach
     public void setBookService(){
-        bookService = new BookService(bookRepository);
+        bookService = new BookService(bookRepository, loanRepository, reservationRepository);
     }
 
 

@@ -21,7 +21,7 @@ public class Reservation {
     private LocalDate reservationDate;
     @ManyToOne
     private Member member;
-    @OneToMany(mappedBy = "reservation")
+    @OneToMany(mappedBy = "reservation", fetch = FetchType.EAGER)
     @ToString.Exclude
     private List<Book> books;
 }

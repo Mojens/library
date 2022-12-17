@@ -23,7 +23,7 @@ public class Loan {
     private LocalDate returnDate;
     @ManyToOne
     private Member member;
-    @OneToMany(mappedBy = "loan")
+    @OneToMany(mappedBy = "loan", fetch = FetchType.EAGER)
     @ToString.Exclude
     private List<Book> books;
 }

@@ -3,12 +3,18 @@ package com.example.library.service;
 import com.example.library.dto.BookRequest;
 import com.example.library.dto.BookResponse;
 import com.example.library.entity.Book;
+import com.example.library.entity.Loan;
+import com.example.library.entity.Reservation;
 import com.example.library.repository.BookRepository;
+import com.example.library.repository.LoanRepository;
+import com.example.library.repository.ReservationRepository;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -16,9 +22,15 @@ public class BookService {
 
 
     private final BookRepository bookRepository;
+    private final LoanRepository loanRepository;
+    private final ReservationRepository reservationRepository;
 
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository,
+                       LoanRepository loanRepository,
+                       ReservationRepository reservationRepository) {
         this.bookRepository = bookRepository;
+        this.loanRepository = loanRepository;
+        this.reservationRepository = reservationRepository;
     }
 
 
@@ -27,7 +39,7 @@ public class BookService {
         return new BookResponse(bookRepository.save(createdBook));
     }
 
-    public List<BookResponse> readAllBooks(Pageable p){
+    public List<BookResponse> readAllBooks(Pageable p) {
         return bookRepository.findAll(p).stream().map(BookResponse::new).toList();
     }
 
@@ -49,9 +61,43 @@ public class BookService {
     }
 
 
+    public ResponseEntity<String> returnBook(@PathVariable Long id) {
+        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("book not found"));
+        if (book.getLoan() != null) {
+            Loan foundLoan = loanRepository.findById(book.getLoan().getId()).orElseThrow(() -> new RuntimeException("Loan not found"));
+            if (foundLoan.getDueDate().isAfter(LocalDate.now())) {
+                List<Book> loanBookList = foundLoan.getBooks();
+                loanBookList.removeIf(b -> b.getId().equals(book.getId()));
+                book.setLoan(null);
+                bookRepository.save(book);
+                foundLoan.setBooks(loanBookList);
+                loanRepository.save(foundLoan);
+                loanRepository.deleteAllByBooksIsNull();
+                return ResponseEntity.ok("Book has been returned late");
+            } else {
+                List<Book> loanBookList = foundLoan.getBooks();
+                loanBookList.removeIf(b -> b.getId().equals(book.getId()));
+                book.setLoan(null);
+                bookRepository.save(book);
+                foundLoan.setBooks(loanBookList);
+                loanRepository.save(foundLoan);
+                loanRepository.deleteAllByBooksIsNull();
+                return ResponseEntity.ok("Book has been removed from Loan");
+            }
+        }
+        if (book.getReservation() != null) {
+            Reservation foundReservation = reservationRepository.findById(book.getReservation().getId()).orElseThrow(() -> new RuntimeException("Reservation not found"));
+            List<Book> reservationBookList = foundReservation.getBooks();
+            reservationBookList.removeIf(b -> b.getId().equals(book.getId()));
+            book.setReservation(null);
+            bookRepository.save(book);
+            foundReservation.setBooks(reservationBookList);
+            reservationRepository.save(foundReservation);
+            return ResponseEntity.ok("Reservation has been removed");
+        }
 
-
-
+        return ResponseEntity.ok("Book has been returned");
+    }
 
 
 }

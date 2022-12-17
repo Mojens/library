@@ -9,6 +9,7 @@ import com.example.library.repository.BookRepository;
 import com.example.library.repository.LoanRepository;
 import com.example.library.repository.MemberRepository;
 import com.example.library.repository.ReservationRepository;
+import com.example.library.service.BookService;
 import com.example.library.service.LoanService;
 import lombok.SneakyThrows;
 import org.springframework.boot.ApplicationArguments;
@@ -27,16 +28,20 @@ public class setupLibrary implements ApplicationRunner {
     private final ReservationRepository reservationRepository;
     private final LoanService loanService;
 
+    private final BookService bookService;
+
     public setupLibrary(BookRepository bookRepository,
                         LoanRepository loanRepository,
                         MemberRepository memberRepository,
                         ReservationRepository reservationRepository,
-                        LoanService loanService) {
+                        LoanService loanService,
+                        BookService bookService) {
         this.bookRepository = bookRepository;
         this.loanRepository = loanRepository;
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.loanService = loanService;
+        this.bookService = bookService;
     }
 
     @Override
@@ -97,14 +102,13 @@ public class setupLibrary implements ApplicationRunner {
                 .returnDate(LocalDate.now().plusDays(7))
                 .dueDate(LocalDate.now().plusDays(14))
                 .checkoutDate(LocalDate.now())
-                .books(List.of(b1, b2))
+                .books(List.of(b1))
                 .build();
         loanRepository.save(loan1);
         m1.setLoans(List.of(loan1));
         memberRepository.save(m1);
         b1.setLoan(loan1);
-        b2.setLoan(loan1);
-        bookRepository.saveAll(List.of(b1, b2));
+        bookRepository.saveAll(List.of(b1));
 
 
         //Make a reservation
@@ -129,7 +133,24 @@ public class setupLibrary implements ApplicationRunner {
                 .memberId(m2.getId())
                 .bookIds(List.of(b4.getId()))
                 .build();
-       loanService.createLoan(loanRequest);
+        loanService.createLoan(loanRequest);
+
+        System.out.println(bookService.returnBook(b1.getId()));
+        /*
+        if (b1.getLoan() != null) {
+            Loan foundLoan = loanRepository.findById(b1.getLoan().getId()).get();
+            List<Book> loanBookList = foundLoan.getBooks();
+            loanBookList.removeIf(book -> book.getId().equals(b1.getId()));
+            b1.setLoan(null);
+            bookRepository.save(b1);
+            foundLoan.setBooks(loanBookList);
+            loanRepository.save(foundLoan);
+            System.out.println(loanRepository.findAll());
+            loanRepository.deleteAllByBooksIsNull();
+            System.out.println(loanRepository.findAll());
+        }
+         */
+
 
     }
 }
