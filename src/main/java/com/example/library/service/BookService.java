@@ -8,6 +8,7 @@ import com.example.library.entity.Reservation;
 import com.example.library.repository.BookRepository;
 import com.example.library.repository.LoanRepository;
 import com.example.library.repository.ReservationRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,8 +40,8 @@ public class BookService {
         return new BookResponse(bookRepository.save(createdBook));
     }
 
-    public List<BookResponse> readAllBooks(Pageable p) {
-        return bookRepository.findAll(p).stream().map(BookResponse::new).toList();
+    public List<BookResponse> readAllBooks() {
+        return bookRepository.findAll().stream().map(BookResponse::new).toList();
     }
 
     public BookResponse updateBook(@RequestBody BookRequest bookRequest, @PathVariable Long id) {
@@ -66,7 +67,8 @@ public class BookService {
         if (book.getLoan() != null) {
             Loan foundLoan = loanRepository.findById(book.getLoan().getId()).orElseThrow(() -> new RuntimeException("Loan not found"));
             if (foundLoan.getDueDate().isAfter(LocalDate.now())) {
-                List<Book> loanBookList = foundLoan.getBooks();
+                List<Book> loanBookList;
+                loanBookList = foundLoan.getBooks();
                 loanBookList.removeIf(b -> b.getId().equals(book.getId()));
                 book.setLoan(null);
                 bookRepository.save(book);

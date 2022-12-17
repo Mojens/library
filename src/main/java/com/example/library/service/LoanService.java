@@ -31,7 +31,7 @@ public class LoanService {
     }
 
 
-    List<LoanResponse> getAllLoans() {
+    public List<LoanResponse> getAllLoans() {
         return loanRepository.findAll().stream().map(LoanResponse::new).toList();
     }
 

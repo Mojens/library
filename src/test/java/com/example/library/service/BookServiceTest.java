@@ -142,8 +142,7 @@ class BookServiceTest {
                 .build();
         BookResponse bookResponse = bookService.createBook(bookRequest);
         assertEquals(bookRequest.getTitle(), bookResponse.getTitle());
-        Pageable pageable = Pageable.unpaged();
-        List<BookResponse> bookResponseList = bookService.readAllBooks(pageable);
+        List<BookResponse> bookResponseList = bookService.readAllBooks();
         assertNotEquals(0, bookResponseList.size());
         assertEquals(4, bookResponseList.size());
         assertEquals(bookRequest.getTitle(), bookResponseList.get(3).getTitle());
@@ -154,14 +153,8 @@ class BookServiceTest {
 
     @Test
     void readAllBooks() {
-        Pageable pageable1 = Pageable.unpaged();
-        List<BookResponse> bookResponseList1 = bookService.readAllBooks(pageable1);
+        List<BookResponse> bookResponseList1 = bookService.readAllBooks();
         assertEquals(3, bookResponseList1.size());
-
-
-        Pageable pageable2 = Pageable.ofSize(2);
-        List<BookResponse> bookResponseList2 = bookService.readAllBooks(pageable2);
-        assertEquals(2, bookResponseList2.size());
     }
 
     @Test
@@ -177,7 +170,7 @@ class BookServiceTest {
         BookResponse bookResponse = bookService.updateBook(bookRequest, foundBook.getId());
         assertEquals(bookRequest.getTitle(), bookResponse.getTitle());
         assertEquals(bookRequest.getAuthor(), bookResponse.getAuthor());
-        List<BookResponse> bookResponseList = bookService.readAllBooks(Pageable.unpaged());
+        List<BookResponse> bookResponseList = bookService.readAllBooks();
         assertEquals(3, bookResponseList.size());
         assertEquals(bookRequest.getTitle(), bookResponseList.get(0).getTitle());
 
@@ -187,7 +180,7 @@ class BookServiceTest {
     void deleteBook() {
         Book foundBook = bookRepository.findById(1L).orElseThrow(() -> new RuntimeException("book not found"));
         bookService.deleteBook(foundBook.getId());
-        List<BookResponse> bookResponseList = bookService.readAllBooks(Pageable.unpaged());
+        List<BookResponse> bookResponseList = bookService.readAllBooks();
         assertEquals(2, bookResponseList.size());
         assertNotEquals(foundBook.getTitle(), bookResponseList.get(0).getTitle());
     }

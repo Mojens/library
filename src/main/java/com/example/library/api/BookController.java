@@ -1,10 +1,17 @@
 package com.example.library.api;
 
+import com.example.library.dto.BookRequest;
+import com.example.library.dto.BookResponse;
+import com.example.library.dto.LoanRequest;
+import com.example.library.dto.LoanResponse;
 import com.example.library.service.BookService;
 import com.example.library.service.LoanService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -18,6 +25,51 @@ public class BookController {
         this.bookService = bookService;
         this.loanService = loanService;
     }
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public BookResponse createBook(@RequestBody BookRequest bookRequest) {
+        return bookService.createBook(bookRequest);
+    }
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public BookResponse updateBook(@RequestBody BookRequest bookRequest, @PathVariable Long id) {
+        return bookService.updateBook(bookRequest, id);
+    }
+    @GetMapping
+    List<BookResponse> readAllBooks(){
+        return bookService.readAllBooks();
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public BookResponse deleteBook(@PathVariable Long id) {
+        return bookService.deleteBook(id);
+    }
+
+    @PostMapping(value = "/return/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> returnBook(@PathVariable Long id) {
+        return bookService.returnBook(id);
+    }
+
+    @GetMapping(value = "/exceeded")
+    public List<BookResponse> getExceededBooks() {
+        return bookService.exceededDueDateBooks();
+    }
+
+    @GetMapping(value = "/borrowed")
+    public List<BookResponse> getBorrowedBooks() {
+        return bookService.allBorrowedBooks();
+    }
+
+    @PostMapping(value = "/loan",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public LoanResponse createLoan(@RequestBody LoanRequest loanRequest) {
+        return loanService.createLoan(loanRequest);
+    }
+
+    @GetMapping(value = "/loans")
+    public List<LoanResponse> readAllLoans() {
+        return loanService.getAllLoans();
+    }
+
+
+
 
 
 
