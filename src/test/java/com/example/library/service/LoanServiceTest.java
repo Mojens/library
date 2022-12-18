@@ -41,6 +41,10 @@ class LoanServiceTest {
         bookRepository = book_Repository;
         memberRepository = member_Repository;
         reservationRepository = reservation_Repository;
+        loanRepository.deleteAll();
+        bookRepository.deleteAll();
+        memberRepository.deleteAll();
+        reservationRepository.deleteAll();
         Member m1 = Member.builder()
                 .userName("user1")
                 .password("password1")

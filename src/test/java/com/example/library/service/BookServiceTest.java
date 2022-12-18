@@ -14,12 +14,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @DataJpaTest
 class BookServiceTest {
@@ -43,6 +43,10 @@ class BookServiceTest {
         loanRepository = loan_Repository;
         reservationRepository = reservation_Repository;
         memberRepository = member_Repository;
+        bookRepository.deleteAll();
+        loanRepository.deleteAll();
+        reservationRepository.deleteAll();
+        memberRepository.deleteAll();
         Member m1 = Member.builder()
                 .userName("user1")
                 .password("password1")
